@@ -70,6 +70,9 @@ int main(int argc, const char* argv[]) {
 			if (game.apply_action(move) != true) break;
 			if (who.check_for_win(game.state())) break;
 		}
+		mv = -1;
+		tile_array.clear();
+		
 		agent& win = game.last_turns(play, evil);
 		stat.close_episode(win.name());
 

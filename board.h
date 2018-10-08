@@ -74,30 +74,60 @@ public:
 	}
 
 	reward slide_left() {
+		/*
 		board prev = *this;
 		reward score = 0;
 		for (int r = 0; r < 4; r++) {
 			auto& row = tile[r];
-			int top = 0, hold = 0, hold_c = 0;
-			bool score_flag = false;
+			int hold = 0, place_index = 0;
+			bool zero_flag = false;
 			for (int c = 0; c < 4; c++) {
 				int tile = row[c];
-				if (tile == 0) continue;
 				row[c] = 0;
-				if (hold) {
-					/*
-					cout << "tile:" << tile << "    " << hold << "\n";
-					cout << ( (tile==1 && hold==2)||(tile==2 && hold==1) );
-					cout << "\n";
-					cout << !( (tile==1 && hold==1)||(tile==2 && hold==2) );
-					cout << "\n";
-					*/
-					if ( ( tile == hold||(tile==1 && hold==2)||(tile==2 && hold==1) ) && c-hold_c == 1 && !score_flag && !( (tile==1 && hold==1)||(tile==2 && hold==2) ) ) {
+				if (tile == 0){
+					place_index = c;
+					zero_flag = true;
+					continue;
+				}
+				else{
+					if (zero_flag){
+						row[place_index] = tile;
+						place_index = c;
+						continue;
+					}
+					else{
+						if (( tile == hold||(tile==2 && hold==1) ) && c==1 && place_index==0 && !( (tile==1 && hold==1)||(tile==2 && hold==2) )){
+							row[place_index] = ++tile;
+							score += (1 << tile);
+							zero_flag = true;
+						}
+						else if (tile==1 && hold==2 && c==1 && place_index==0){
+							row[place_index] = 3;
+							score += (1 << tile);
+							zero_flag = true;
+						}	
+						else{
+							hold = tile;
+							place_index = c;
+						}
+						
+					}
+				}
+				
+				
+				/*
+					if ( ( tile == hold||(tile==2 && hold==1) ) && c-hold_c == 1 && !score_flag && !( (tile==1 && hold==1)||(tile==2 && hold==2) ) ) {
 						row[top++] = ++tile;
 						score += (1 << tile);
 						score_flag = true;
 						hold = 0;
 					} 
+					else if ((tile==1 && hold==2) && !score_flag){
+						row[top++] = 3;
+						score += (1 << tile);
+						score_flag = true;
+						hold = 0;
+					}
 					else {
 						row[top++] = hold;
 						hold = tile;
@@ -106,6 +136,58 @@ public:
 				else {
 					hold = tile;
 					hold_c = c;
+				}
+				
+			}
+		}
+		return (*this != prev) ? score : -1;
+		*/
+		
+		
+		board prev = *this;
+		reward score = 0;
+		for (int r = 0; r < 4; r++) {
+			auto& row = tile[r];
+			int top = 0, hold = 0, hold_c = 0, place_index = 0;
+			bool score_flag = false, zero_flag = false;
+			for (int c = 0; c < 4; c++) {
+				int tile = row[c];
+				if (tile == 0){
+					zero_flag = true;
+					place_index = c;
+					continue;
+				} 
+				row[c] = 0;
+				if (!zero_flag){
+					if (hold) {
+						if (( tile == hold||(tile==2 && hold==1) ) && c-place_index==1 && !( (tile==1 && hold==1)||(tile==2 && hold==2) )) {
+							row[top++] = ++tile;
+							score += (1 << tile);
+							zero_flag = true;
+							place_index = c;
+							hold = 0;
+						} 
+						else if ((tile==1 && hold==2) && c-place_index==1){
+							tile = 3;
+							row[top++] = tile;
+							score += (1 << tile);
+							zero_flag = true;
+							place_index = c;
+							hold = 0;
+						}
+						else {
+							row[top++] = hold;
+							hold = tile;
+							place_index = c;
+						}
+					}
+					else {
+						hold = tile;
+					}
+				}
+				else{
+					row[place_index] = tile;
+					place_index = c;
 				}
 			}
 			if (hold) tile[r][top] = hold;

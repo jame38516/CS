@@ -7,7 +7,8 @@
 #include <algorithm>
 #include "board.h"
 #include "action.h"
-
+int mv = -1;
+std::vector<int> tile_array;
 class agent {
 public:
 	agent(const std::string& args = "") {
@@ -62,10 +63,30 @@ protected:
 class rndenv : public random_agent {
 public:
 	rndenv(const std::string& args = "") : random_agent("name=random role=environment " + args),
-		space({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }), popup(0, 9) {}
-
+		space({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) {}
 	virtual action take_action(const board& after) {
+	//	cout << mv << "\n";
+		space.clear();
+		if (mv == -1)
+			space.assign({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+		else if (mv == 0)
+			space.assign({ 12, 13, 14, 15 });
+		else if (mv == 1)
+			space.assign({ 0, 4, 8, 12 });
+		else if (mv == 2)
+			space.assign({ 0, 1, 2, 3});
+		else
+			space.assign({3, 7, 11, 15});
+		
 		std::shuffle(space.begin(), space.end(), engine);
+	/*	
+		for (int i=0; i<=15; i++){
+			cout<< after(i);
+			if ((i+1)%4 == 0)
+				cout << "\n"; 
+		}
+		cout << "\n"; 
+	*/
 		for (int pos : space) {
 			if (after(pos) != 0) continue;
 			//board::cell tile = popup(engine) ? 1 : 2;
@@ -81,15 +102,15 @@ public:
 				tile = tile_array.back();
 				tile_array.pop_back();
 			}
-				
+			
 			return action::place(pos, tile);
 		}
 		return action();
 	}
 
 private:
-	std::array<int, 16> space;
-	std::vector<int> tile_array;
+	std::vector<int> space;
+	
 	std::uniform_int_distribution<int> popup;
 	board::cell tile;
 };
@@ -98,6 +119,7 @@ private:
  * dummy player
  * select a legal action randomly
  */
+
 class player : public random_agent {
 public:
 	player(const std::string& args = "") : random_agent("name=dummy role=player " + args),
@@ -106,8 +128,13 @@ public:
 	virtual action take_action(const board& before) {
 		std::shuffle(opcode.begin(), opcode.end(), engine);
 		for (int op : opcode) {
+			
 			board::reward reward = board(before).slide(op);
-			if (reward != -1) return action::slide(op);
+			if (reward != -1) {
+				mv = op;
+				return action::slide(op);
+			}
+			
 		}
 		return action();
 	}

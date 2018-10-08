@@ -80,7 +80,6 @@ public:
 
 		if (!tstat) return;
 		for (size_t t = 0, c = 0; c < blk; c += stat[t++]) {
-			cout<< stat[t] << "\n";
 			if (stat[t] == 0) continue;
 			unsigned accu = std::accumulate(std::begin(stat) + t, std::end(stat), 0);
 			

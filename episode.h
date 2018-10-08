@@ -37,7 +37,12 @@ public:
 	}
 	agent& take_turns(agent& play, agent& evil) {
 		ep_time = millisec();
-		return (std::max(step() + 1, size_t(2)) % 2) ? play : evil;
+		if ((step() + 1) < 10)
+			return evil;  //whose turn evil-environment   play-player
+		else{
+			return ((step() + 1) % 2) ? evil : play;
+		}
+			
 	}
 	agent& last_turns(agent& play, agent& evil) {
 		return take_turns(evil, play);
