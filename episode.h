@@ -35,6 +35,7 @@ public:
 		ep_score += reward;
 		return true;
 	}
+	/////////////////////////////////////////////////////////////////////
 	agent& take_turns(agent& play, agent& evil) {
 		ep_time = millisec();
 		if ((step() + 1) < 10)
@@ -44,6 +45,7 @@ public:
 		}
 			
 	}
+	//////////////////////////////////////////////////////////////////////
 	agent& last_turns(agent& play, agent& evil) {
 		return take_turns(evil, play);
 	}

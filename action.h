@@ -50,6 +50,7 @@ protected:
 	unsigned code;
 };
 
+
 class action::slide : public action {
 public:
 	static constexpr unsigned type = type_flag('s');
@@ -80,6 +81,7 @@ protected:
 	action& reinterpret(const action* a) const { return *new (const_cast<action*>(a)) slide(*a); }
 	static __attribute__((constructor)) void init() { entries()[type_flag('s')] = new slide; }
 };
+
 
 class action::place : public action {
 public:
